@@ -17,3 +17,7 @@ report：HTMLTestRunner生成html报告
 
 配置条件：
 Excel：pip install xlrd
+
+
+
+data:url-用拼接的方式
