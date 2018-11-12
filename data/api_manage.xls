@@ -1,1 +1,5 @@
-id	method	url	params	headers	body	type	statuscode	checkpoint	times	error	msg	result
+id	method	url	params	headers	body	type	statuscode	checkpoint	isPressTest	Pparams	times	error	msg	result
+1	GET	http://api.m2c2017test.com/m2c.scm/dealer/app/goods/list	"{""dealerId"": ""JXS1382A365F7D94350991D84AF23233FD7"",
+                   ""goodsStatus"":"""",
+                   ""pageNum"":1,
+                   ""rows"":10}"											

@@ -1,31 +1,39 @@
 #coding=utf-8
 import unittest
 from ddt import ddt,data,unpack,file_data
+import ddt
+import os
+from common import readExcel,writeExcel,base_api
+import requests
 
+curpath=os.path.dirname(os.path.realpath(__file__))
+textxlsx=os.path.join(curpath,"api_manage.xlsx")
 
+report_path=os.path.join(os.path.dirname(curpath),"report")
+reportxlsx=os.path.join(report_path,"result.xlsx")
 
-@ddt
+testdata=readExcel.ExcelUtil(textxlsx).dict_data()
+print testdata
+
+@ddt.ddt
 class ddtTestcase(unittest.TestCase):
-    # @data(1,2,3)
-    # def test_ddt1(self,value):
-    #     print value
-    #     self.assertEqual(value,2,"不相等")
-    #     #self.assertEqual(value,2)
+    @classmethod
+    def setUpClass(cls):
+        cls.s=requests.session()
+        writeExcel.copy_excel(textxlsx,reportxlsx)
 
-    # @data((1,2),(2,3),(2,2))
-    # @unpack
-    # def test_tuple(self,*args,**kwargs):
-    #     print args
+    @ddt.data(*testdata)
+    def test_api(self,data):
+        print data
+        res=base_api.send_requests(self.s,data)
+        base_api.write_result(res,filepath=reportxlsx)
+        check=data["checkpoint"]
+        print "检查点-->:%s" %check
 
-    @unpack
-    @data({"a":1,"b":2},{"d":3,"e":2})
-    def test_dict(self,value1,value2):
-        print value1,value2
+        res_text=res["text"]
+        print "返回实际结果-->:%s" %res_text
 
-    @file_data('dd.json')
-    def test_file(self,value):
-        print value
-
+        self.assertTrue(check in res_text)
 
 if __name__=='__main__':
     unittest.main()
