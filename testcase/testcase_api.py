@@ -4,29 +4,43 @@ from ddt import ddt,data,unpack,file_data
 import ddt
 import os
 from common import readExcel,writeExcel,base_api
+from common.readExcel import report_path
 import requests
+ROOT = lambda base : os.path.join(os.path.dirname(__file__), base).replace('\\','/')
 
-curpath=os.path.dirname(os.path.realpath(__file__))
-textxlsx=os.path.join(curpath,"api_manage.xlsx")
+# filepath=open(ROOT("../data"),'r')
+#根目录运行获取路径
+data_path=os.path.join(os.path.abspath(os.getcwd()),"data")
+report_path=report_path
+#子目录运行获取路径
+# data_path = os.path.join(os.path.abspath(os.path.dirname(os.getcwd())), "data")
+# report_path = os.path.join(os.path.abspath(os.path.dirname(os.getcwd())), "report")
 
-report_path=os.path.join(os.path.dirname(curpath),"report")
-reportxlsx=os.path.join(report_path,"result.xlsx")
+#获取测试数据
+testdata=readExcel.FileUtil(data_path).get_file()
 
-testdata=readExcel.ExcelUtil(textxlsx).dict_data()
-print testdata
+# curpath=os.path.dirname(os.path.realpath(__file__))
+# textxlsx=os.path.join(curpath,"api_manage.xlsx")
+#
+# report_path=os.path.join(os.path.dirname(curpath),"report")
+# reportxlsx=os.path.join(report_path,"result.xlsx")
+
+print "返回测试数据集合:%s"%testdata
 
 @ddt.ddt
 class ddtTestcase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.s=requests.session()
-        writeExcel.copy_excel(textxlsx,reportxlsx)
+        # writeExcel.copy_excel(textxlsx,reportxlsx)
+        # cls.dataxlsx=textxlsx
+        # cls.reportxlsx=reportxlsx
 
     @ddt.data(*testdata)
     def test_api(self,data):
         print data
         res=base_api.send_requests(self.s,data)
-        base_api.write_result(res,filepath=reportxlsx)
+        base_api.write_result(res,filepath=data["reportfile"])
         check=data["checkpoint"]
         print "检查点-->:%s" %check
 

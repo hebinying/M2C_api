@@ -3,7 +3,7 @@ from xlutils.copy import copy
 import xlrd,xlwt
 
 def copy_excel(excelpath1,excelpath2):
-    wb1=xlrd.open_workbook(excelpath1)
+    wb1=xlrd.open_workbook(excelpath1,'rb')
     wb2=copy(wb1)
     wb2.save(excelpath2)
 

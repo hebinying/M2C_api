@@ -8,6 +8,7 @@ import os,datetime
 firstrowname=['id','method','url','params','headers','body','type','checkpoint','isPressTest','Pparams','statuscode','times','error','msg','result']
 
 def send_requests(s,testdata):
+    print testdata
     method=testdata['method']
     url=testdata['url']
     try:
@@ -66,7 +67,7 @@ def send_requests(s,testdata):
 
     #对返回结果的操作
     res={}
-    res["id"]=testdata["id"]
+    res["id"]=testdata["case_id"]
     res["row_num"]=testdata["rowNum"]
     res["method"]=method
     res["statuscode"]=str(resp.status_code)
@@ -90,7 +91,7 @@ def send_requests(s,testdata):
     res["msg"]=resp.text
     res["text"]=resp.text
     # print "text:"+resp.text
-    print res["row_num"]
+    # print res["row_num"]
     return res
 
 def write_result(result,filepath="result.xlsx"):
