@@ -1,4 +1,4 @@
-#coding=utf-8
+#coding=gbk
 from xlutils.copy import copy
 import xlrd,xlwt
 

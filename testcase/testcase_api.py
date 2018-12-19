@@ -1,4 +1,4 @@
-#coding=utf-8
+#coding=gbk
 import unittest
 from ddt import ddt,data,unpack,file_data
 import ddt
@@ -9,14 +9,16 @@ import requests
 ROOT = lambda base : os.path.join(os.path.dirname(__file__), base).replace('\\','/')
 
 # filepath=open(ROOT("../data"),'r')
-#æ ¹ç›®å½•è¿è¡Œè·å–è·¯å¾„
-data_path=os.path.join(os.path.abspath(os.getcwd()),"data")
+#¸ùÄ¿Â¼ÔËĞĞ»ñÈ¡Â·¾¶
+# data_path=os.path.join(os.path.abspath(os.getcwd()),"data")
+data_path=os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))),"data")
 report_path=report_path
-#å­ç›®å½•è¿è¡Œè·å–è·¯å¾„
+print "Êı¾İ»ñÈ¡Â·¾¶£º"+data_path
+#×ÓÄ¿Â¼ÔËĞĞ»ñÈ¡Â·¾¶
 # data_path = os.path.join(os.path.abspath(os.path.dirname(os.getcwd())), "data")
 # report_path = os.path.join(os.path.abspath(os.path.dirname(os.getcwd())), "report")
 
-#è·å–æµ‹è¯•æ•°æ®
+#»ñÈ¡²âÊÔÊı¾İ
 testdata=readExcel.FileUtil(data_path).get_file()
 
 # curpath=os.path.dirname(os.path.realpath(__file__))
@@ -25,7 +27,7 @@ testdata=readExcel.FileUtil(data_path).get_file()
 # report_path=os.path.join(os.path.dirname(curpath),"report")
 # reportxlsx=os.path.join(report_path,"result.xlsx")
 
-print "è¿”å›æµ‹è¯•æ•°æ®é›†åˆ:%s"%testdata
+print u"·µ»Ø²âÊÔÊı¾İ¼¯ºÏ:%s"%testdata
 
 @ddt.ddt
 class ddtTestcase(unittest.TestCase):
@@ -40,14 +42,14 @@ class ddtTestcase(unittest.TestCase):
     def test_api(self,data):
         print data
         res=base_api.send_requests(self.s,data)
+        print u"´«²Î-->:%s"%data
         base_api.write_result(res,filepath=data["reportfile"])
         check=data["checkpoint"]
-        print "æ£€æŸ¥ç‚¹-->:%s" %check
-
+        print u"¼ì²éµã-->:%s" %check
         res_text=res["text"]
-        print "è¿”å›å®é™…ç»“æœ-->:%s" %res_text
-
+        print u"·µ»ØÊµ¼Ê½á¹û-->:%s" %res_text
         self.assertTrue(check in res_text)
+        #ĞèÒªÔö¼Ó½á¹ûÅĞ¶Ï
 
 if __name__=='__main__':
     unittest.main()

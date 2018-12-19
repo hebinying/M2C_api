@@ -1,12 +1,14 @@
-#coding=utf-8
+#coding=gbk
 import xlrd
 import writeExcel
 import os
 
 # data_path=os.path.join(os.path.abspath(os.path.dirname(os.getcwd())),"data")
-#æ ¹ç›®å½•è¿è¡Œè·å–è·¯å¾„
-report_path=os.path.join(os.path.abspath(os.getcwd()),"report")
-#å­ç›®å½•è¿è¡Œè·å–è·¯å¾„
+#¸ùÄ¿Â¼ÔËĞĞ»ñÈ¡Â·¾¶
+# report_path=os.path.join(os.path.abspath(os.getcwd()),"report")
+report_path=os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))),"report")
+print "±¨¸æµÄÂ·¾¶£º"+report_path
+#×ÓÄ¿Â¼ÔËĞĞ»ñÈ¡Â·¾¶
 # report_path = os.path.join(os.path.abspath(os.path.dirname(os.getcwd())), "report")
 
 class FileUtil():
@@ -14,19 +16,19 @@ class FileUtil():
         self.path=path
         self.textxlsx=[]
         self.reportxlsx=[]
-        print "æµ‹è¯•æ•°é‡æ¥æºç›®å½•:%s"%(self.path)
+        print "²âÊÔÊıÁ¿À´Ô´Ä¿Â¼:%s"%(self.path)
         if os.path.exists(self.path):
             dirs = os.listdir(self.path)
             for dir in dirs:
-                if os.path.splitext(dir)[1] == '.xlsx' and "api" in dir:
-                    print "æµ‹è¯•æ•°æ®æ¥æºè¡¨ï¼š%s"%dir
+                if os.path.splitext(dir)[1] == '.xlsx' and "m2c_api" in dir:
+                    print "²âÊÔÊı¾İÀ´Ô´±í£º%s"%dir
                     self.textxlsx.append(os.path.join(self.path, dir))
                     self.reportxlsx.append(os.path.join(report_path, dir))
 
     def get_file(self):
         testcases=[]
         for i in range(0,len(self.textxlsx)):
-            print "æµ‹è¯•æ•°æ®è¡¨ï¼š%s"%self.textxlsx[i]
+            print "²âÊÔÊı¾İ±í£º%s"%self.textxlsx[i]
             # print self.reportxlsx[i]
             writeExcel.copy_excel(self.textxlsx[i], self.reportxlsx[i])
             table=TableUtil(self.textxlsx[i],self.reportxlsx[i])
@@ -43,21 +45,21 @@ class TableUtil():
         self.path=excelPath
         self.reportpath=reportPath
         self.sheet=len(self.data.sheets())
-        print "æ–‡ä»¶å†…è¡¨çš„æ•°é‡ï¼š%d" %self.sheet
+        print "ÎÄ¼şÄÚ±íµÄÊıÁ¿£º%d" %self.sheet
     def execute(self):
         list=[]
         if self.sheet<=0:
-            print "è¡¨æ ¼æ•°ä¸º0"
+            print "±í¸ñÊıÎª0"
         else:
-            for i in range(0,self.sheet-1):
+            for i in range(0,self.sheet):
                 a=ExcelUtil(self.path,self.reportpath,i)
                 if a.dict_data()!=None:
                     list.extend(a.dict_data())
             return list
-#è¡¨æ ¼è¯»å–
+#±í¸ñ¶ÁÈ¡
 class ExcelUtil():
     def __init__(self,excelPath,reportPath,index=0):
-        # print "æ–‡ä»¶%sé‡Œç¬¬%dä¸ªè¡¨" %(excelPath,index)
+        # print "ÎÄ¼ş%sÀïµÚ%d¸ö±í" %(excelPath,index)
         self.data=xlrd.open_workbook(excelPath)
         self.reportPath=reportPath
         self.table=self.data.sheet_by_index(index)
@@ -65,17 +67,17 @@ class ExcelUtil():
         self.ncols=self.table.ncols
         if self.nrows>0:
             self.keys = self.table.row_values(0)
-        print "æ–‡ä»¶%så†…ç¬¬%dè¡¨ä¸­æœ‰è¡Œåˆ—æ•°%d:%d" %(excelPath,index,self.nrows,self.ncols)
+        print "ÎÄ¼ş%sÄÚµÚ%d±íÖĞÓĞĞĞÁĞÊı%d:%d" %(excelPath,index,self.nrows,self.ncols)
 
 
     def dict_data(self):
         if self.nrows<=1:
-            print "æ€»è¡Œæ•°å°äº1ï¼Œæ— æµ‹è¯•æ•°æ®ï¼Œè¯·æ£€æŸ¥æ•°æ®ä¿¡æ¯"
+            print "×ÜĞĞÊıĞ¡ÓÚ1£¬ÎŞ²âÊÔÊı¾İ£¬Çë¼ì²éÊı¾İĞÅÏ¢"
         else:
             r=[]
             for j in range(1,self.nrows):
                 s={}
-                # rowNumåšä»€ä¹ˆç”¨çš„
+                # rowNum×öÊ²Ã´ÓÃµÄ
                 s['reportfile']=self.reportPath
                 s['rowNum']=j
                 values=self.table.row_values(j)

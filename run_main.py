@@ -1,4 +1,4 @@
-#coding=utf-8
+#coding=gbk
 import unittest
 import os
 import HTMLTestRunner
@@ -10,6 +10,7 @@ import xml.dom.minidom
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+ROOT = lambda base : os.path.join(os.path.dirname(__file__), base).replace('\\','/')
 
 curpath=os.path.dirname(os.path.realpath(__file__))
 print curpath
@@ -17,10 +18,12 @@ report_path=os.path.join(curpath,"report")
 if not os.path.exists(report_path):os.mkdir(report_path)
 
 case_path=os.path.join(curpath,"testcase")
+
 print case_path
 def add_case(casepath=case_path,rule="test*.py"):
     discover=unittest.defaultTestLoader.discover(casepath,
-                                                 pattern=rule,)
+                                                 pattern=rule)
+    print discover
     return discover
 
 
@@ -28,27 +31,30 @@ def run_case(all_case,reportpath=report_path):
     now=datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     print now
     htmlreport=reportpath+r"\result"+now+".html"
-    print "æµ‹è¯•æŠ¥å‘Šç”Ÿæˆåœ°å€ï¼š%s" %htmlreport
+    print "²âÊÔ±¨¸æÉú³ÉµØÖ·£º%s" %htmlreport
     fp=file(htmlreport,"wb")
     runner=HTMLTestRunner.HTMLTestRunner(stream=fp,
                                          verbosity=1,
-                                         title="apiæµ‹è¯•æŠ¥å‘Š"+datetime.datetime.now().strftime("%Y%m%d"),
-                                         description="ç”¨ä¾‹æ‰§è¡Œæƒ…å†µ")
+                                         title=u"api²âÊÔ±¨¸æ"+datetime.datetime.now().strftime("%Y%m%d"),
+                                         description=u"ÓÃÀıÖ´ĞĞÇé¿ö")
     runner.run(all_case)
     fp.close()
 
-emailConf = r".\config/email_cofig.xml"
+# emailConf= r".\config/email_cofig.xml"
+emailConf =ROOT( r"config/email_cofig.xml")
 
-#ç§»é™¤ç”Ÿæˆçš„æŠ¥å‘Šæ–‡ä»¶
+#ÒÆ³ıÉú³ÉµÄ±¨¸æÎÄ¼ş
 def removefile(filepath=r'./report',name='.html'):
-    print "here"
+    filepath=ROOT(filepath)
+    print "»ñÈ¡É¾³ı±¨¸æÂ·¾¶£º"+filepath
     dirs=os.listdir(filepath)
+
     for dir in dirs:
         if os.path.splitext(dir)[1]==name:
             file=filepath+'/'+dir
-            print "å¼€å§‹åˆ é™¤æ–‡ä»¶:"+file
+            print "¿ªÊ¼É¾³ıÎÄ¼ş:"+file
             os.remove(file)
-            print "åˆ é™¤æ–‡ä»¶:" + file+"æˆåŠŸ"
+            print "É¾³ıÎÄ¼ş:" + file+"³É¹¦"
 
 class CommEmail:
 
@@ -75,8 +81,9 @@ class CommEmail:
 
         # from conf-profile to set email-server  configure
         self.fEmailServerConfFile=emailConf
-
+        print "ÓÊ¼şÅäÖÃÂ·¾¶£º"+self.fEmailServerConfFile
         try:
+            print "ÓÊ¼şĞÅÏ¢³õÊ¼»¯"
             xmlFeed = xml.dom.minidom.parse(self.fEmailServerConfFile)
             xmlEmaiSMTP = xmlFeed.getElementsByTagName('smtp')
             xmlEmailFrom = xmlFeed.getElementsByTagName('From')
@@ -85,7 +92,7 @@ class CommEmail:
             xmlEmailSubject = xmlFeed.getElementsByTagName('Subject')
             xmlEmailComments = xmlFeed.getElementsByTagName('comment')
             xmlEmailattachs = xmlFeed.getElementsByTagName('attach')
-
+            print "ÓÊ¼şĞÅÏ¢³õÊ¼»¯1"
             # only one smtp-tag
             for smtpConf in xmlEmaiSMTP:
                 self.sIp = smtpConf.getAttribute("ip")
@@ -93,10 +100,14 @@ class CommEmail:
                 self.sUser = smtpConf.getAttribute("user")
                 self.sPassword = smtpConf.getAttribute("password")
 
+            print "ÓÊ¼şĞÅÏ¢³õÊ¼»¯2"
             # To
             for To in xmlEmaiTos:
+                print "ÓÊ¼şĞÅÏ¢³õÊ¼»¯4"
+                print To
                 file = To.getAttribute("file")
-                f=open((file).decode('utf-8'),'r')
+                print file
+                f=open((ROOT(file)).decode('utf-8'),'r')
                 s=f.readlines()
                 for i in s:
                     print i
@@ -108,22 +119,24 @@ class CommEmail:
             # From & Subject
             self.sEmailOwner = xmlEmailFrom[0].getAttribute("address")
             self.sSubject = xmlEmailSubject[0].getAttribute("title")
-
+            print "ÓÊ¼şĞÅÏ¢³õÊ¼»¯3"
             # self.emComment = open(xmlEmailComments[0].getAttribute("file")).read()
-            # commenté‚®ä»¶å†…å®¹
+            # commentÓÊ¼şÄÚÈİ
             for comment in xmlEmailComments:
-                cfile = comment.getAttribute("file")
+                print comment
+                cfile = ROOT(comment.getAttribute("file"))
+                print cfile
                 dirs=os.listdir(cfile)
                 for dir in dirs:
                     # pattern=re.compile(r".*result+(.*?)+html")
-                    #å–æ–‡ä»¶å
+                    #È¡ÎÄ¼şÃû
                     text=os.path.splitext(dir)[1]
                     if text==".html":
-                        # é‚®ä»¶å†…å®¹
+                        # ÓÊ¼şÄÚÈİ
                         print dir
-                        #commenté‚®ä»¶å†…å®¹
+                        #commentÓÊ¼şÄÚÈİ
                         self.emComment.append(open(cfile+'/'+dir).read())
-                        #æ·»åŠ æŠ¥å‘Š
+                        #Ìí¼Ó±¨¸æ
                         self.dattach.append(cfile+'/'+dir)
             print self.emComment
             print self.dattach
@@ -159,7 +172,7 @@ class CommEmail:
             t = MIMEBase('html', 'utf-8')
             t.set_payload(open(attach, 'rb').read())
             #encoders.encode_base64(t)
-            #é‚®ä»¶çš„æ–‡ä»¶åæ ‡é¢˜ä¸èƒ½å¤ªé•¿ï¼Œå¦åˆ™ä¼šæ·»åŠ å¤±è´¥
+            #ÓÊ¼şµÄÎÄ¼şÃû±êÌâ²»ÄÜÌ«³¤£¬·ñÔò»áÌí¼ÓÊ§°Ü
             t.add_header('Content-Disposition', 'attachment;filename="%s"' % os.path.basename(attach))
             #t.add_header('Content-Disposition', 'attachment;filename="discover.html"')
             msg.attach(t)
@@ -170,7 +183,7 @@ class CommEmail:
             emailHandle.set_debuglevel(1)
             emailHandle.connect('smtp.exmail.qq.com', int(self.sPort))
             emailHandle.login(self.sUser, self.sPassword)
-            #å‘é€é‚®ä»¶
+            #·¢ËÍÓÊ¼ş
             emailHandle.sendmail(msg["From"], msg["To"].split(';'), msg.as_string())
 
             emailHandle.quit()
@@ -182,9 +195,9 @@ class CommEmail:
 
 if __name__=="__main__":
     formater='%(asctime)s %(process)d:%(pathname)s %(filename)s[line:%(lineno)d]  %(module)s %(funcName)s %(levelname)s %(message)s'
-    logname="./Report/log"+datetime.datetime.now().strftime("%Y%m%d")+".log"
-    infoLogname="./Report/infolog"+datetime.datetime.now().strftime("%Y%m%d")+".log"
-    errorLogname="./Report/errorlog"+datetime.datetime.now().strftime("%Y%m%d")+".log"
+    logname=curpath+"./Report/log"+datetime.datetime.now().strftime("%Y%m%d")+".log"
+    infoLogname=curpath+"./Report/infolog"+datetime.datetime.now().strftime("%Y%m%d")+".log"
+    errorLogname=curpath+"./Report/errorlog"+datetime.datetime.now().strftime("%Y%m%d")+".log"
     logging.basicConfig(level=logging.NOTSET,
                         format=formater,
                         datefmt='%Y-%m-%d %H:%M:%S',
@@ -194,6 +207,6 @@ if __name__=="__main__":
     print "cases"
     print cases
     run_case(cases)
-    semail=CommEmail()
-    semail.sendHtmlEmail()
-    removefile()
+    # semail=CommEmail()
+    # semail.sendHtmlEmail()
+    # removefile()
